@@ -1,3 +1,4 @@
+
 #! /bin/bash
 
 # Which run to use
@@ -24,7 +25,7 @@ fi
 echo " counting for ${target} target"
 
 # Which scripts to run.
-script="UTIL_SIDIS/Bean_counter.C"
+script="UTIL_SIDIS/Bean_counter_all2.C"
 
 ## Which commands to run.
 runbc="root -l \"${script}(${runNum}, ${targ})\""

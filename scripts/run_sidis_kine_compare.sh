@@ -1,27 +1,34 @@
 #! /bin/bash
 
+# Number of run to use
+Numruns=$1
+if [ -z "$Numruns" ]; then
+    echo " give the number of Runs to chain together"
+    exit
+fi
+
 # Which run to use
-runNum=$1
+runNum=$2
 if [ -z "$runNum" ]; then
-    echo " give Run Number to use"
+    echo " give starting Run Number to use"
     exit
 fi
 # which target
-tar=$2
+tar=$3
 if [ -z "$tar" ]; then
     echo " give target d or h"
     exit
 fi
 
 if [ "$tar" = "d" ]; then
-    targ=1
+    targ=2
 fi
 if [ "$tar" = "h" ]; then
-    targ=2
+    targ=1
 fi
 
 # which particle in SHMS
-part=$3
+part=$4
 if [ -z "$part" ]; then
     echo " give SHMS particle type p or m "
     exit
@@ -35,14 +42,14 @@ if [ "$part" = "m" ]; then
 fi
 
 # Which kinematic group
-kgrp=$4
+kgrp=$5
 if [ -z "$kgrp" ]; then
     echo " give kinematic group 1 - 4"
     exit
 fi
 
 # Which kinematic group
-ptgrp=$5
+ptgrp=$6
 if [ -z "$ptgrp" ]; then
     echo " give p_t setting 1 - 12"
     exit
@@ -54,7 +61,7 @@ echo " Comparing kinematic variables for  pi${part} in SHMS"
 script="UTIL_SIDIS/scripts/SIDIS_kine_compare.C"
 
 # Which commands to run.
-runbc="root -l \"${script}(${runNum}, ${targ}, ${pityp}, ${kgrp}, ${ptgrp})\""
+runbc="root -l \"${script}(${Numruns}, ${runNum}, ${targ}, ${pityp}, ${kgrp}, ${ptgrp})\""
 eval ${runbc}
 
 echo "If the plots look good quit root otherwise call an expert"

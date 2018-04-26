@@ -4,7 +4,7 @@
 
 
 //void SIDIS_kine_compare(Int_t runnumber, Int_t targ=1, Int_t pisign=1, Int_t kingrp=1, Int_t ptgrp=1){
-void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisign, Int_t kingrp, Int_t ptgrp){
+void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisign, Int_t kingrp, Int_t ptgrp){
                      
 
   TString ROOT_FILE_PATH = "/net/cdaq/cdaql3data/cdaq/hallc-online/ROOTfiles/";
@@ -12,6 +12,11 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TString fileNameM = SIMC_ROOT_FILE_PATH;
   Int_t runnum1 = runnumber;
   Int_t runnum2 = runnumber + numruns-1;
+  /////// Rootfiles for dummy runs ///
+  Int_t numdummy = 2; // runmber of dummy runs
+  const Int_t dummyRun[numdummy]={3500,3501};  // run number of the dummy runs
+  Double_t d_chr_ratio = 7.72;    // charge ratio of regular to dummy runs LH2 = 122 mC, LD2 = 84.3 mC, dummy=15.8 mC
+
   if (targ == 1) {
       fileNameM += "sidis_h_";
   }
@@ -52,42 +57,52 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h1_epi_PcointimeROC2    = new TH1D("SHMS ROC2 Corrected epi Coin Time","SHMS ROC2 Corrected epi Coin Time; cointime [ns]",       480, -24, 24); 
   TH1D *h1_epi_PcointimeROC2_C  = new TH1D("SHMS ROC2 Corrected epi Coin Time_C","SHMS ROC2 Corrected epi Coin Time_C; cointime [ns]",   480, -24, 24); 
   TH1D *h1_epi_PcointimeROC2_B  = new TH1D("SHMS ROC2 Corrected epi Coin Time_B","SHMS ROC2 Corrected epi Coin Time_B; cointime [ns]",   480, -24, 24); 
+  TH1D *h1_depi_PcointimeROC2    = new TH1D("SHMS ROC2 Corrected depi Coin Time","SHMS ROC2 Corrected depi Coin Time; cointime [ns]",       480, -24, 24); 
+  TH1D *h1_depi_PcointimeROC2_C  = new TH1D("SHMS ROC2 Corrected depi Coin Time_C","SHMS ROC2 Corrected depi Coin Time_C; cointime [ns]",   480, -24, 24); 
 
-  // TH1D *h_Q2d = new TH1D("h_Q2d",Form("Q2 (GeV2), Run#:%d", runnumber),100,1,6);  //Q2
- TH1D *h_Q2d = new TH1D("h_Q2d","Q2 (GeV2)",100,1,6);  //Q2
+
+  TH1D *h_Q2d = new TH1D("h_Q2d","Q2 (GeV2)",100,1,6);  //Q2
   TH1D *h_Q2s = new TH1D("h_Q2s","Q2 (GeV2)",100,1,6);
   TH1D *h_Q2a = new TH1D("h_Q2a","Q2 (GeV2)",100,1,6); // for accidentals
+  TH1D *h_Q2ds = new TH1D("h_Q2ds","Q2 (GeV2)",100,1,6); // for dummy subtraction
 
   TH1D *h_W2d = new TH1D("h_W2d","W2 (GeV2)", 150, 5, 11.0);// W2
   TH1D *h_W2s = new TH1D("h_W2s","W2 (GeV2)", 150, 5, 11.0);
   TH1D *h_W2a = new TH1D("h_W2a","W2 (GeV2)", 150, 5, 11.0);
+  TH1D *h_W2ds = new TH1D("h_W2ds","W2 (GeV2)", 150, 5, 11.0);
 
-  TH1D *h_xd = new TH1D("h_xd","X_bj", 100,0.1, 0.6);   //added                                     
-  TH1D *h_xs = new TH1D("h_xs","X_bj", 100,0.1, 0.6);    //added                                   
-  TH1D *h_xa = new TH1D("h_xa","X_bj", 100,0.1, 0.6);    //added                                   
+  TH1D *h_xd = new TH1D("h_xd","X_bj", 100,0.1, 0.6);  
+  TH1D *h_xs = new TH1D("h_xs","X_bj", 100,0.1, 0.6);  
+  TH1D *h_xa = new TH1D("h_xa","X_bj", 100,0.1, 0.6);  
+  TH1D *h_xds = new TH1D("h_xds","X_bj", 100,0.1, 0.6); 
 
   if (ptgrp == 1 || ptgrp == 2){
-   TH1D *h_zd = new TH1D("h_zd","z_had", 100,0.7, 1.1);   //added                                    
-   TH1D *h_zs = new TH1D("h_zs","z_had", 100,0.7, 1.1);   //added  
-   TH1D *h_za = new TH1D("h_za","z_had", 100,0.7, 1.1);   //added  
+   TH1D *h_zd = new TH1D("h_zd","z_had", 100,0.7, 1.1); 
+   TH1D *h_zs = new TH1D("h_zs","z_had", 100,0.7, 1.1); 
+   TH1D *h_za = new TH1D("h_za","z_had", 100,0.7, 1.1); 
+   TH1D *h_zds = new TH1D("h_zds","z_had", 100,0.7, 1.1); 
   }
   else if (ptgrp == 3 || ptgrp == 4){
-   TH1D *h_zd = new TH1D("h_zd","z_had", 100,0.45, 0.85);   //added
-   TH1D *h_zs = new TH1D("h_zs","z_had", 100,0.45, 0.85);   //added  
-   TH1D *h_za = new TH1D("h_za","z_had", 100,0.45, 0.85);   //added  
+   TH1D *h_zd = new TH1D("h_zd","z_had", 100,0.45, 0.85); 
+   TH1D *h_zs = new TH1D("h_zs","z_had", 100,0.45, 0.85); 
+   TH1D *h_za = new TH1D("h_za","z_had", 100,0.45, 0.85); 
+   TH1D *h_zds = new TH1D("h_zds","z_had", 100,0.45, 0.85); 
   }
   else if (ptgrp > 4 ){
-   TH1D *h_zd = new TH1D("h_zd","z_had", 100,0.3, 0.7);   //added                                    
-   TH1D *h_zs = new TH1D("h_zs","z_had", 100,0.3, 0.7);   //added  
-   TH1D *h_za = new TH1D("h_za","z_had", 100,0.3, 0.7);   //added  
+   TH1D *h_zd = new TH1D("h_zd","z_had", 100,0.3, 0.7);  
+   TH1D *h_zs = new TH1D("h_zs","z_had", 100,0.3, 0.7);  
+   TH1D *h_za = new TH1D("h_za","z_had", 100,0.3, 0.7);  
+   TH1D *h_zds = new TH1D("h_zds","z_had", 100,0.3, 0.7);  
   }
   TH1D *h_ptd = new TH1D("h_ptd","pt (GeV)", 75,-0.25, 1.00);   
   TH1D *h_pts = new TH1D("h_pts","pt (GeV)", 75,-0.25, 1.00);
   TH1D *h_pta = new TH1D("h_pta","pt (GeV)", 75,-0.25, 1.00);
+  TH1D *h_ptds = new TH1D("h_ptds","pt (GeV)", 75,-0.25, 1.00);
 
   TH1D *h_MissMass2d = new TH1D("h_MissMass2d", "MissMass2 (GeV2)", 150, 1.5, 8.5);
   TH1D *h_MissMass2s = new TH1D("h_MissMass2s", "MissMass2 (GeV2)", 150, 1.5, 8.5); 
   TH1D *h_MissMass2a = new TH1D("h_MissMass2a", "MissMass2 (GeV2)", 150, 1.5, 8.5); 
+  TH1D *h_MissMass2ds = new TH1D("h_MissMass2ds", "MissMass2 (GeV2)", 150, 1.5, 8.5); 
 
   TH1D *h_phipqd = new TH1D ("h_phipqd", "Phi_hadron (Rad)", 100, -4, 7);
   TH1D *h_phipqs = new TH1D ("h_phipqs", "Phi_hadron (Rad)", 100, -4, 7);
@@ -105,6 +120,7 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_hxptar = new TH1D("h_hxptar","HMS XPTAR (rad)",100,-0.15,0.15);
   TH1D *h_hyptar = new TH1D("h_hyptar","HMS YPTAR (rad)",100,-0.1,0.1);
   TH1D *h_hytar = new TH1D("h_hytar","HMS YTAR (cm)",100,-5.0,5.0);    
+
   TH1D *h_pdelta = new TH1D("h_pdelta","SHMS DELTA (%)",100,-25,30);          
   TH1D *h_pxptar = new TH1D("h_sxptar","SHMS XPTAR (rad)",100,-0.15,0.15);
   TH1D *h_pyptar = new TH1D("h_syptar","SHMS YPTAR (rad)",100,-0.15,0.15);
@@ -119,6 +135,16 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_pxptara = new TH1D("h_sxptara","SHMS XPTAR (rad)",100,-0.15,0.15);
   TH1D *h_pyptara = new TH1D("h_syptara","SHMS YPTAR (rad)",100,-0.15,0.15);
   TH1D *h_pytara = new TH1D("h_pytara","SHMS YTAR (cm)",100,-5,5); 
+
+  TH1D *h_hdeltads = new TH1D("h_hdeltads","HMS DELTA (%)",100,-15,15);      
+  TH1D *h_hxptards = new TH1D("h_hxptards","HMS XPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_hyptards = new TH1D("h_hyptards","HMS YPTAR (rad)",100,-0.1,0.1);
+  TH1D *h_hytards = new TH1D("h_hytards","HMS YTAR (cm)",100,-5.0,5.0);    
+
+  TH1D *h_pdeltads = new TH1D("h_pdeltads","SHMS DELTA (%)",100,-25,30); 
+  TH1D *h_pxptards = new TH1D("h_sxptards","SHMS XPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_pyptards = new TH1D("h_syptards","SHMS YPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_pytards = new TH1D("h_pytards","SHMS YTAR (cm)",100,-5,5); 
 
 
   TChain *tt = new TChain("T");
@@ -135,17 +161,35 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
     tt->Add(fileNameD);
     runnumber++;
   }
-  //  TFile *f1 = new TFile(fileNameD);
-  //  TTree *tt = (TTree*)f1->Get("T");
-  //get the relevant branch
+
   int nentriesD = tt->GetEntries();
   cout<<"Entries:\t"<<nentriesD<<endl;
 
-  Double_t HgtrX, HgtrTh, HgtrY, HgtrPh, hdelta, PgtrX, PgtrTh, PgtrY, PgtrPh, pdelta;// Ep, Epp, p_e, p_p, defEm;
+  /////// opening Rootfiles for dummy runs ///
+
+  TChain *td = new TChain("T");
+  
+  for (int jd=0;jd<numdummy;jd++){
+
+    cout << "opening dummy run number: " << dummyRun[jd]  <<"\n";
+    //read the input file from data
+    TString fileNameDS = ROOT_FILE_PATH;
+    fileNameDS += "coin_replay_production_"; //read the root file from data
+    fileNameDS += dummyRun[jd]; //read the root file from data
+    fileNameDS += "_-1.root"; //read the root file from data
+
+    td->Add(fileNameDS);
+  }
+
+  int nentriesDS = td->GetEntries();
+  cout<<"Entries from dummy runs:\t"<<nentriesDS<<endl;
+
+
+  Double_t HgtrX, HgtrTh, HgtrY, HgtrPh, hdelta, PgtrX, PgtrTh, PgtrY, PgtrPh, pdelta;
   Double_t HgtrBetaCalc, PgtrBetaCalc, evtType, PgtrP, HgtrP, PhodStatus, PhodStartTime, PhodfpHitsTime;
   Double_t cointime, HhodStatus, HhodStartTime, HhodfpHitsTime, SHMSpartMass, HMSpartMass;
   Double_t pkinomega, pkinQ2, pkinxbj, pEm, pPm, pbeta, hbeta, hcalepr, hcaletot, hcernpe, pcaletot, pcalepr, pcernpe, paeronpe;
-  Double_t pkinPmiss, pkinq, pkinthetaq, pkinphx_cm, pkinph_xq; //Added
+  Double_t pkinPmiss, pkinq, pkinthetaq, pkinphx_cm, pkinph_xq; 
   Double_t TcoinpTRIG1_ROC1_tdcTimeRaw, TcoinpTRIG4_ROC1_tdcTimeRaw, TcoinpTRIG1_ROC2_tdcTimeRaw;
   Double_t TcoinhTRIG1_ROC1_tdcTimeRaw, TcoinhTRIG1_ROC2_tdcTimeRaw, TcoinhTRIG4_ROC1_tdcTimeRaw;
   Double_t TcoinhTRIG4_ROC2_tdcTimeRaw, TcoinpTRIG4_ROC2_tdcTimeRaw;
@@ -168,29 +212,39 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
 
   tt->SetBranchAddress("P.gtr.p", &PgtrP); 
   tt->SetBranchAddress("H.gtr.p", &HgtrP); 
-  tt->SetBranchAddress("P.gtr.beta", &pbeta);                                                                                 
+  tt->SetBranchAddress("P.gtr.beta", &pbeta);                                         
+                                        
   tt->SetBranchAddress("H.gtr.beta", &hbeta); 
-  tt->SetBranchAddress("H.gtr.dp", &hdelta);                                                                                
-  tt->SetBranchAddress("P.gtr.dp", &pdelta);                                                                                
-                                                                                                                            
-  tt->SetBranchAddress("P.cal.eprtracknorm", &pcalepr);                                                                    
-  tt->SetBranchAddress("P.cal.etottracknorm", &pcaletot);                                                                  
+  tt->SetBranchAddress("H.gtr.dp", &hdelta);                                                       
+                         
+  tt->SetBranchAddress("P.gtr.dp", &pdelta);                                                      
+ 
+                         
+  tt->SetBranchAddress("P.cal.eprtracknorm", &pcalepr);                      
+                                              
+  tt->SetBranchAddress("P.cal.etottracknorm", &pcaletot);           
+                                                       
   tt->SetBranchAddress("P.hgcer.npeSum", &pcernpe);
   tt->SetBranchAddress("P.aero.npeSum", &paeronpe);                                                 
-                                                                                                             
+                                                               
   tt->SetBranchAddress("H.cal.eprtracknorm", &hcalepr);                                  
   tt->SetBranchAddress("H.cal.etottracknorm", &hcaletot);                                          
   tt->SetBranchAddress("H.cer.npeSum", &hcernpe); 
 
 
-  tt->SetBranchAddress("P.hod.starttime", &PhodStartTime);                                               
-  tt->SetBranchAddress("P.hod.fpHitsTime", &PhodfpHitsTime);                                             
-  tt->SetBranchAddress("H.hod.starttime", &HhodStartTime);                                               
+  tt->SetBranchAddress("P.hod.starttime", &PhodStartTime);                                      
+  tt->SetBranchAddress("P.hod.fpHitsTime", &PhodfpHitsTime);                        
+                     
+  tt->SetBranchAddress("H.hod.starttime", &HhodStartTime);                      
+                         
   tt->SetBranchAddress("H.hod.fpHitsTime", &HhodfpHitsTime); 
-  tt->SetBranchAddress("T.coin.pTRIG1_ROC1_tdcTimeRaw", &TcoinpTRIG1_ROC1_tdcTimeRaw);                   
+  tt->SetBranchAddress("T.coin.pTRIG1_ROC1_tdcTimeRaw", &TcoinpTRIG1_ROC1_tdcTimeRaw);   
+                
   tt->SetBranchAddress("T.coin.pTRIG4_ROC1_tdcTimeRaw", &TcoinpTRIG4_ROC1_tdcTimeRaw);
-  tt->SetBranchAddress("T.coin.pTRIG1_ROC2_tdcTimeRaw", &TcoinpTRIG1_ROC2_tdcTimeRaw);                   
-  tt->SetBranchAddress("T.coin.pTRIG4_ROC2_tdcTimeRaw", &TcoinpTRIG4_ROC2_tdcTimeRaw);                   
+  tt->SetBranchAddress("T.coin.pTRIG1_ROC2_tdcTimeRaw", &TcoinpTRIG1_ROC2_tdcTimeRaw);     
+              
+  tt->SetBranchAddress("T.coin.pTRIG4_ROC2_tdcTimeRaw", &TcoinpTRIG4_ROC2_tdcTimeRaw);         
+          
 
   TCut hpdelta;
   TCut epiCut;                                                                   
@@ -208,8 +262,6 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   h1PhodoStartTime->GetXaxis()->SetTitle("SHMS hodo start time [ns]");           
   Double_t PhodoStartTimeMean = h1PhodoStartTime->GetMean();  
 
-
-
                    
   TCanvas *canvas2 = new TCanvas("canvas2","canvas2");                           
   tt->Draw("H.hod.starttime >> HMShodoStartTime", epiCut && hpdelta );  
@@ -217,40 +269,133 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   h1HhodoStartTime->GetXaxis()->SetTitle("HMS hodo start time [ns]");            
   Double_t HhodoStartTimeMean = h1HhodoStartTime->GetMean();                     
 
+  //////  for Dummy subtraction  /////
+
+  Double_t dsHgtrX, dsHgtrTh, dsHgtrY, dsHgtrPh, dshdelta, dsPgtrX, dsPgtrTh, dsPgtrY, dsPgtrPh, dspdelta;
+  Double_t dsHgtrBetaCalc, dsPgtrBetaCalc, dsPgtrP, dsHgtrP, dsPhodStatus, dsPhodStartTime, dsPhodfpHitsTime;
+  Double_t dscointime, dsHhodStatus, dsHhodStartTime, dsHhodfpHitsTime, dsSHMSpartMass, dsHMSpartMass;
+  Double_t dspkinomega, dspkinQ2, dspkinxbj, dspEm, dspPm, dspbeta, dshbeta, dshcalepr, dshcaletot, dshcernpe, dspcaletot, dspcalepr, dspcernpe, dspaeronpe;
+  Double_t dspkinPmiss, dspkinq, dspkinthetaq, dspkinphx_cm, dspkinph_xq; 
+  Double_t dsTcoinpTRIG1_ROC1_tdcTimeRaw, dsTcoinpTRIG4_ROC1_tdcTimeRaw, dsTcoinpTRIG1_ROC2_tdcTimeRaw;
+  Double_t dsTcoinhTRIG1_ROC1_tdcTimeRaw, dsTcoinhTRIG1_ROC2_tdcTimeRaw, dsTcoinhTRIG4_ROC1_tdcTimeRaw;
+  Double_t dsTcoinhTRIG4_ROC2_tdcTimeRaw, dsTcoinpTRIG4_ROC2_tdcTimeRaw;
+  Double_t dsPreactz,Hreactz;
 
 
-  tt->SetBranchAddress("H.kin.primary.W", &pkinW);
-  tt->SetBranchAddress("H.kin.primary.omega", &pkinomega);
-  tt->SetBranchAddress("H.kin.primary.Q2", &pkinQ2);
-  tt->SetBranchAddress("H.kin.primary.x_bj", &pkinxbj); 
+  // Foal plane coords
+  Double_t dsPdcXfp;
+  Double_t dsPdcXpfp;
+  Double_t dsPdcYfp;
+  Double_t dsPdcYpfp;
+  Double_t dsHdcXfp;
+  Double_t dsHdcXpfp;
+  Double_t dsHdcYfp;
+  Double_t dsHdcYpfp;
 
-  tt->SetBranchAddress("P.kin.secondary.th_xq", &pkinthetaq);        
+
+
+
+  td->SetBranchAddress("P.gtr.p", &dsPgtrP); 
+  td->SetBranchAddress("H.gtr.p", &dsHgtrP); 
+  td->SetBranchAddress("P.gtr.beta", &dspbeta);                                         
+                                        
+  td->SetBranchAddress("H.gtr.beta", &dshbeta); 
+  td->SetBranchAddress("H.gtr.dp", &dshdelta);                                                       
+                         
+  td->SetBranchAddress("P.gtr.dp", &dspdelta);                                                      
+ 
+                         
+  td->SetBranchAddress("P.cal.eprtracknorm", &dspcalepr);                      
+                                              
+  td->SetBranchAddress("P.cal.etottracknorm", &dspcaletot);           
+                                                       
+  td->SetBranchAddress("P.hgcer.npeSum", &dspcernpe);
+  td->SetBranchAddress("P.aero.npeSum", &dspaeronpe);                                                 
+                                                               
+  td->SetBranchAddress("H.cal.eprtracknorm", &dshcalepr);                                  
+  td->SetBranchAddress("H.cal.etottracknorm", &dshcaletot);                                          
+  td->SetBranchAddress("H.cer.npeSum", &dshcernpe); 
+
+
+  td->SetBranchAddress("P.hod.starttime", &dsPhodStartTime);                                      
+  td->SetBranchAddress("P.hod.fpHitsTime", &dsPhodfpHitsTime);                        
+                     
+  td->SetBranchAddress("H.hod.starttime", &dsHhodStartTime);                      
+                         
+  td->SetBranchAddress("H.hod.fpHitsTime", &dsHhodfpHitsTime); 
+  td->SetBranchAddress("T.coin.pTRIG1_ROC1_tdcTimeRaw", &dsTcoinpTRIG1_ROC1_tdcTimeRaw);   
+                
+  td->SetBranchAddress("T.coin.pTRIG4_ROC1_tdcTimeRaw", &dsTcoinpTRIG4_ROC1_tdcTimeRaw);
+  td->SetBranchAddress("T.coin.pTRIG1_ROC2_tdcTimeRaw", &dsTcoinpTRIG1_ROC2_tdcTimeRaw);     
+              
+  td->SetBranchAddress("T.coin.pTRIG4_ROC2_tdcTimeRaw", &dsTcoinpTRIG4_ROC2_tdcTimeRaw);         
+          
+
+  TCut dshpdelta;
+  TCut dsepiCut;                                                                   
+
+
+
+  dshpdelta = "P.gtr.dp > -10 && P.gtr.dp < 20 && H.gtr.dp > -10 && H.gtr.dp < 10";
+  dsepiCut = "P.aero.npeSum > 1.0 && P.cal.eprtracknorm < 0.2 && H.cer.npeSum > 1.0 && H.cal.etottracknorm > 0.6 && H.cal.etottracknorm < 2.0 && H.cal.eprtracknorm  > 0.2"; 
+
+
+
+  TCanvas *canvas3 = new TCanvas("canvas3","canvas3");                           
+  td->Draw("P.hod.starttime >> SHMShodoStartTime", dsepiCut && dshpdelta );  
+  TH1D *h1dsPhodoStartTime = (TH1D*)gDirectory->Get("SHMShodoStartTime");
+  h1dsPhodoStartTime->GetXaxis()->SetTitle("SHMS hodo start time [ns]");           
+  Double_t PhodoStartTimeMeands = h1dsPhodoStartTime->GetMean();  
+
+                   
+  TCanvas *canvas4 = new TCanvas("canvas4","canvas4");                           
+  td->Draw("H.hod.starttime >> HMShodoStartTime", dsepiCut && dshpdelta );  
+  TH1D *h1dsHhodoStartTime = (TH1D*)gDirectory->Get("HMShodoStartTime");           
+  h1HhodoStartTime->GetXaxis()->SetTitle("HMS hodo start time [ns]");            
+  Double_t HhodoStartTimeMeands = h1dsHhodoStartTime->GetMean();                     
+
+
+
+  td->SetBranchAddress("H.kin.primary.W", &dspkinW);
+  td->SetBranchAddress("H.kin.primary.omega", &dspkinomega);
+  td->SetBranchAddress("H.kin.primary.Q2", &dspkinQ2);
+  td->SetBranchAddress("H.kin.primary.x_bj", &dspkinxbj); 
+
+  td->SetBranchAddress("P.kin.secondary.th_xq", &dspkinthetaq);        
       
-  tt->SetBranchAddress("H.kin.primary.q3m", &pkinq);              
+  td->SetBranchAddress("H.kin.primary.q3m", &dspkinq);              
 
-  tt->SetBranchAddress("P.kin.secondary.ph_xq",&pkinph_xq);  //"Azimuth of Detected particle with scattering plane (rad)"
-  if (targ == 1) tt->SetBranchAddress("P.kin.secondary.emiss", &pEm);   //missing energy     
-  tt->SetBranchAddress("P.kin.secondary.pmiss", &pPm);    //missing momentum
-  tt->SetBranchAddress("H.gtr.x", &HgtrX);                                                               
-  tt->SetBranchAddress("H.gtr.th", &HgtrTh);                                                             
-  tt->SetBranchAddress("H.gtr.y", &HgtrY);                                                               
-  tt->SetBranchAddress("H.gtr.ph", &HgtrPh);                                                             
+  td->SetBranchAddress("P.kin.secondary.ph_xq",&dspkinph_xq);  //"Azimuth of Detected particle with scattering plane (rad)"
+  if (targ == 1) tt->SetBranchAddress("P.kin.secondary.emiss", &dspEm);   //missing energy     
+  td->SetBranchAddress("P.kin.secondary.pmiss", &dspPm);    //missing momentum
+  td->SetBranchAddress("H.gtr.x", &dsHgtrX); 
+                                                              
+  td->SetBranchAddress("H.gtr.th", &dsHgtrTh);                                                    
+        
+  td->SetBranchAddress("H.gtr.y", &dsHgtrY);                                                      
+         
+  td->SetBranchAddress("H.gtr.ph", &dsHgtrPh);                                                  
+           
 
-  tt->SetBranchAddress("P.gtr.x", &PgtrX);                                                               
-  tt->SetBranchAddress("P.gtr.th", &PgtrTh);                                                             
-  tt->SetBranchAddress("P.gtr.y", &PgtrY);                                                               
-  tt->SetBranchAddress("P.gtr.ph", &PgtrPh);                                                             
+  td->SetBranchAddress("P.gtr.x", &dsPgtrX);                                                    
+           
+  td->SetBranchAddress("P.gtr.th", &dsPgtrTh);                                                  
+           
+  td->SetBranchAddress("P.gtr.y", &dsPgtrY);                                               
+                
+  td->SetBranchAddress("P.gtr.ph", &dsPgtrPh);                                                  
+           
 
     
-  tt->SetBranchAddress("H.dc.x_fp", &HdcXfp);
-  tt->SetBranchAddress("H.dc.xp_fp", &HdcXpfp);
-  tt->SetBranchAddress("H.dc.y_fp", &HdcYfp);
-  tt->SetBranchAddress("H.dc.yp_fp", &HdcYpfp);    
+  td->SetBranchAddress("H.dc.x_fp", &dsHdcXfp);
+  td->SetBranchAddress("H.dc.xp_fp", &dsHdcXpfp);
+  td->SetBranchAddress("H.dc.y_fp", &dsHdcYfp);
+  td->SetBranchAddress("H.dc.yp_fp", &dsHdcYpfp);    
 
-  tt->SetBranchAddress("P.dc.x_fp", &PdcXfp);
-  tt->SetBranchAddress("P.dc.xp_fp", &PdcXpfp);
-  tt->SetBranchAddress("P.dc.y_fp", &PdcYfp);
-  tt->SetBranchAddress("P.dc.yp_fp", &PdcYpfp);    
+  td->SetBranchAddress("P.dc.x_fp", &dsPdcXfp);
+  td->SetBranchAddress("P.dc.xp_fp", &dsPdcXpfp);
+  td->SetBranchAddress("P.dc.y_fp", &dsPdcYfp);
+  td->SetBranchAddress("P.dc.yp_fp", &dsPdcYpfp);    
 
 
   Double_t pOffset = 1.5; //9.5 + 10;  // in ns                                  
@@ -262,6 +407,7 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   Double_t DeltaHMSpathLength;             // For now assume that it's same as HMScentralPathLen 
   Double_t SHMScoinCorr = 0.0;                                                   
   Double_t HMScoinCorr = 0.0;                                                    
+
   Double_t SHMSrawCoinTimeROC1;                                                  
   Double_t SHMSrawCoinTimeROC2;                                                  
   Double_t HMSrawCoinTimeROC1;                                                   
@@ -321,9 +467,9 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   Int_t sh4=max_value - 3*4 -1.5;
   Double_t acc_scale_fac = -3.0/((sh2-sh1)+(sh3-sh4));
 
-  for (int kk=0; kk<nentriesD;  kk++){
-    tt->GetEntry(kk);
-    if (kk % 50000 == 0) cout << kk*100/nentriesD << "   % of data done" << endl;
+  for (int ka=0; ka<nentriesD;  ka++){
+    tt->GetEntry(ka);
+    if (ka % 50000 == 0) cout << ka*100/nentriesD << "   % of data done" << endl;
     evtType = tt->GetLeaf("fEvtHdr.fEvtType")->GetValue(); 
     hpdelta_cut = hdelta > -10 && hdelta < 10 && pdelta > -10 && pdelta < 20 ;
     epievent_cut = paeronpe > 0. && pcalepr < 0.2 && pcaletot < 0.5 && hcaletot > 0.6 && hcaletot < 2.0 && hpdelta_cut  && hcernpe > 0.;
@@ -403,6 +549,9 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
     }
   }  
 
+
+
+
   TH1D *h_Q2c = new TH1D(*h_Q2d); // for clean events
   if (!(h_Q2c->GetSumw2N() > 0)) h_Q2c->Sumw2(kTRUE);
   h_Q2c->Add(h_Q2a,acc_scale_fac);
@@ -459,6 +608,100 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_pytarc = new TH1D(*h_pytar); // for clean events
   if (!(h_pytarc->GetSumw2N() > 0)) h_pytarc->Sumw2(kTRUE);
   h_pytarc->Add(h_pytara,acc_scale_fac);
+
+
+  // Now the calculations for dummy subtraction
+
+  for (int kd=0; kd<nentriesDS;  kd++){
+    td->GetEntry(kd);
+    if (kd % 50000 == 0) cout << kd*100/nentriesD << "   % of data done" << endl;
+    evtType = td->GetLeaf("fEvtHdr.fEvtType")->GetValue(); 
+    hpdelta_cut = hdelta > -10 && hdelta < 10 && pdelta > -10 && pdelta < 20 ;
+    epievent_cut = paeronpe > 0. && pcalepr < 0.2 && pcaletot < 0.5 && hcaletot > 0.6 && hcaletot < 2.0 && hpdelta_cut  && hcernpe > 0.;
+    event_cut = epievent_cut;
+
+
+    if (epievent_cut) {
+     SHMSpartMass = 0.1395704; // pion mass in GeV/c^2 
+
+	//  ---------------cointime calculation ------------------
+	DeltaHMSpathLength = 12.462*HgtrTh + 0.1138*HgtrTh*HgtrX - 0.0154*HgtrX - 72.292*HgtrTh*HgtrTh - 0.0000544*HgtrX*HgtrX - 116.52*HgtrPh*HgtrPh;               
+	PgtrBetaCalc = PgtrP/sqrt(PgtrP*PgtrP + SHMSpartMass*SHMSpartMass);        
+	HgtrBetaCalc = HgtrP/sqrt(HgtrP*HgtrP + HMSpartMass*HMSpartMass);          
+
+	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
+	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+
+	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
+	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+
+	SHMScorrCoinTimeROC1 = (TcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
+
+	SHMScorrCoinTimeROC2 = (TcoinpTRIG1_ROC2_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC2_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; 
+	h1_depi_PcointimeROC2->Fill(SHMScorrCoinTimeROC2);    
+            
+	//-------------------------------------------------------------------------
+      }
+  }
+
+  Int_t dbin_max = h1_depi_PcointimeROC2->GetMaximumBin();
+  Double_t dmax_value = h1_depi_PcointimeROC2->GetBinCenter(dbin_max);
+
+
+  for (int kc=0; kc<nentriesDS;  kc++){
+    td->GetEntry(kc);
+    if (kc % 50000 == 0) cout << kc*100/nentriesDS << "   % of data done" << endl;
+    evtType = td->GetLeaf("fEvtHdr.fEvtType")->GetValue(); 
+    hpdelta_cut = hdelta > -10 && hdelta < 10 && pdelta > -10 && pdelta < 20 ;
+    epievent_cut = paeronpe > 0. && pcalepr < 0.2 && pcaletot < 0.5 && hcaletot > 0.6 && hcaletot < 2.0 && hpdelta_cut  && hcernpe > 0.;
+    event_cut = epievent_cut;
+
+
+    if (epievent_cut) {
+     SHMSpartMass = 0.1395704; // pion mass in GeV/c^2 
+
+	//  ---------------cointime calculation ------------------
+	DeltaHMSpathLength = 12.462*HgtrTh + 0.1138*HgtrTh*HgtrX - 0.0154*HgtrX - 72.292*HgtrTh*HgtrTh - 0.0000544*HgtrX*HgtrX - 116.52*HgtrPh*HgtrPh;               
+	PgtrBetaCalc = PgtrP/sqrt(PgtrP*PgtrP + SHMSpartMass*SHMSpartMass);        
+	HgtrBetaCalc = HgtrP/sqrt(HgtrP*HgtrP + HMSpartMass*HMSpartMass);          
+
+	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
+	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+
+	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
+	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+
+	SHMScorrCoinTimeROC1 = (TcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
+
+	SHMScorrCoinTimeROC2 = (TcoinpTRIG1_ROC2_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC2_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; 
+
+        ctime_cut = SHMScorrCoinTimeROC2 > dmax_value - 1.5 && SHMScorrCoinTimeROC2 < dmax_value + 1.5;
+
+        if (ctime_cut) {
+	  h_Q2ds->Fill(pkinQ2);
+	  pKinW_2= pkinW*pkinW;
+	  h_W2ds->Fill(pKinW_2);
+	  h_xd->Fill(pkinxbj);
+	  E_pi = sqrt(pow(pionMass,2) + pow(PgtrP,2));
+	  z_had = E_pi/pkinomega;
+	  h_zd->Fill(z_had);
+	  ptd = (PgtrP)*sin(pkinthetaq);
+          h_ptd->Fill(ptd);  
+          if (targ == 2) pEm = pkinomega + 0.9389187 - E_pi ;
+          MissMass2d = pEm*pEm - pPm*pPm;
+	  h_MissMass2d->Fill(MissMass2d); 
+	  h_hdelta->Fill(hdelta);  
+          h_hxptar->Fill(HgtrTh);
+          h_hyptar->Fill(HgtrPh);
+	  h_hytar->Fill(HgtrY); 
+	  h_pdelta->Fill(pdelta); 
+          h_pxptar->Fill(PgtrTh);
+          h_pyptar->Fill(PgtrPh);
+	  h_pytar->Fill(PgtrY); 
+	  h1_epi_PcointimeROC2_C->Fill(SHMScorrCoinTimeROC2);    
+	}
+    }
+  }  
 
 
   h_Q2d->GetXaxis()->SetTitle("Q2 (GeV2)");

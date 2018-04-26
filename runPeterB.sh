@@ -7,24 +7,10 @@ if [ -z "$runNum" ]; then
     exit
 fi
 
-# which target
-target=$2
-if [ -z "$target" ]; then
-    echo " give target type h or d "
-    exit
-fi
-
-if [ "$target" = "h" ]; then
     targ=1
-fi
-if [ "$target" = "d" ]; then
-    targ=2
-fi
-
-echo " counting for ${target} target"
 
 # Which scripts to run.
-script="UTIL_SIDIS/Bean_counter.C"
+script="UTIL_SIDIS/PeterB.C"
 
 ## Which commands to run.
 runbc="root -l \"${script}(${runNum}, ${targ})\""
