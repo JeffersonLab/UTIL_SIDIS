@@ -58,7 +58,7 @@ fi
 echo " Comparing kinematic variables for  pi${part} in SHMS"
 
 # Which scripts to run.
-script="UTIL_SIDIS/scripts/SIDIS_kine_compare.C"
+script="UTIL_SIDIS/scripts/SIDIS_kine_compare_wds.C"
 
 # Which commands to run.
 runbc="root -l \"${script}(${Numruns}, ${runNum}, ${targ}, ${pityp}, ${kgrp}, ${ptgrp})\""

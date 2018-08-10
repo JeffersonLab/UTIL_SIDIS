@@ -5,13 +5,11 @@
 
 //void SIDIS_kine_compare(Int_t runnumber, Int_t targ=1, Int_t pisign=1, Int_t kingrp=1, Int_t ptgrp=1){
 void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisign, Int_t kingrp, Int_t ptgrp){
-                   
+                     
 
   TString ROOT_FILE_PATH = "/net/cdaq/cdaql3data/cdaq/hallc-online/ROOTfiles/";
   TString SIMC_ROOT_FILE_PATH = "/net/cdaq/cdaql3data/cdaq/hallc-online/SIMC_ROOTfiles/";
   TString fileNameM = SIMC_ROOT_FILE_PATH;
-  Int_t runnum1 = runnumber;
-  Int_t runnum2 = runnumber + numruns-1;
   if (targ == 1) {
       fileNameM += "sidis_h_";
   }
@@ -53,8 +51,7 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h1_epi_PcointimeROC2_C  = new TH1D("SHMS ROC2 Corrected epi Coin Time_C","SHMS ROC2 Corrected epi Coin Time_C; cointime [ns]",   480, -24, 24); 
   TH1D *h1_epi_PcointimeROC2_B  = new TH1D("SHMS ROC2 Corrected epi Coin Time_B","SHMS ROC2 Corrected epi Coin Time_B; cointime [ns]",   480, -24, 24); 
 
-  // TH1D *h_Q2d = new TH1D("h_Q2d",Form("Q2 (GeV2), Run#:%d", runnumber),100,1,6);  //Q2
- TH1D *h_Q2d = new TH1D("h_Q2d","Q2 (GeV2)",100,1,6);  //Q2
+  TH1D *h_Q2d = new TH1D("h_Q2d",Form("Q2 (GeV2), Run#:%d", runnumber),100,1,6);  //Q2
   TH1D *h_Q2s = new TH1D("h_Q2s","Q2 (GeV2)",100,1,6);
   TH1D *h_Q2a = new TH1D("h_Q2a","Q2 (GeV2)",100,1,6); // for accidentals
 
@@ -97,8 +94,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *s_hyptar = new TH1D("s_hyptar","HMS YPTAR (rad)",100,-0.1,0.1);
   TH1D *s_hytar = new TH1D("s_hytar","HMS YTAR (cm)",100,-5.0,5.0);
   TH1D *s_pdelta = new TH1D("s_pdelta","SHMS DELTA (%)",100,-25,30);   
-  TH1D *s_pxptar = new TH1D("s_sxptar","SHMS XPTAR (rad)",100,-0.1,0.1);
-  TH1D *s_pyptar = new TH1D("s_syptar","SHMS YPTAR (rad)",100,-0.08,0.08);
+  TH1D *s_pxptar = new TH1D("s_sxptar","SHMS XPTAR (rad)",100,-0.15,0.15);
+  TH1D *s_pyptar = new TH1D("s_syptar","SHMS YPTAR (rad)",100,-0.15,0.15);
   TH1D *s_pytar = new TH1D("s_sytar","SHMS YTAR (cm)",100,-5,5);  
 
   TH1D *h_hdelta = new TH1D("h_hdelta","HMS DELTA (%)",100,-15,15);      
@@ -106,8 +103,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_hyptar = new TH1D("h_hyptar","HMS YPTAR (rad)",100,-0.1,0.1);
   TH1D *h_hytar = new TH1D("h_hytar","HMS YTAR (cm)",100,-5.0,5.0);    
   TH1D *h_pdelta = new TH1D("h_pdelta","SHMS DELTA (%)",100,-25,30);          
-  TH1D *h_pxptar = new TH1D("h_sxptar","SHMS XPTAR (rad)",100,-0.1,0.1);
-  TH1D *h_pyptar = new TH1D("h_syptar","SHMS YPTAR (rad)",100,-0.08,0.08);
+  TH1D *h_pxptar = new TH1D("h_sxptar","SHMS XPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_pyptar = new TH1D("h_syptar","SHMS YPTAR (rad)",100,-0.15,0.15);
   TH1D *h_pytar = new TH1D("h_pytar","SHMS YTAR (cm)",100,-5,5); 
 
   TH1D *h_hdeltaa = new TH1D("h_hdeltaa","HMS DELTA (%)",100,-15,15);      
@@ -116,15 +113,15 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_hytara = new TH1D("h_hytara","HMS YTAR (cm)",100,-5.0,5.0);    
 
   TH1D *h_pdeltaa = new TH1D("h_pdeltaa","SHMS DELTA (%)",100,-25,30); 
-  TH1D *h_pxptara = new TH1D("h_sxptara","SHMS XPTAR (rad)",100,-0.1,0.1);
-  TH1D *h_pyptara = new TH1D("h_syptara","SHMS YPTAR (rad)",100,-0.08,0.08);
+  TH1D *h_pxptara = new TH1D("h_sxptara","SHMS XPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_pyptara = new TH1D("h_syptara","SHMS YPTAR (rad)",100,-0.15,0.15);
   TH1D *h_pytara = new TH1D("h_pytara","SHMS YTAR (cm)",100,-5,5); 
 
 
   TChain *tt = new TChain("T");
   
   for (int j=0;j<numruns;j++){
-
+    runnumber = runnumber + j;
     cout << "opening run number: " <<  runnumber <<"\n";
     //read the input file from data
     TString fileNameD = ROOT_FILE_PATH;
@@ -133,7 +130,6 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
     fileNameD += "_-1.root"; //read the root file from data
 
     tt->Add(fileNameD);
-    runnumber++;
   }
   //  TFile *f1 = new TFile(fileNameD);
   //  TTree *tt = (TTree*)f1->Get("T");
@@ -393,11 +389,11 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
 	  h_hdeltaa->Fill(hdelta);  
           h_hxptara->Fill(HgtrTh);
           h_hyptara->Fill(HgtrPh);
-	  h_hytara->Fill(HgtrY);
+	  h_hytar->Fill(HgtrY);
 	  h_pdeltaa->Fill(pdelta); 
           h_pxptara->Fill(PgtrTh);
           h_pyptara->Fill(PgtrPh);
-	  h_pytara->Fill(PgtrY); 
+	  h_pytar->Fill(PgtrY); 
 	  h1_epi_PcointimeROC2_B->Fill(SHMScorrCoinTimeROC2);    
         }
     }
@@ -551,23 +547,23 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   gROOT->SetBatch(kFALSE);
 
 
-  TCanvas *cc1 = new TCanvas ("cc1","cc1",800,800);
+  TCanvas *cc1 = new TCanvas ("cc1","cc1",500,500);
   cc1->Divide(1,1);
   cc1->cd(1);
   h1_epi_PcointimeROC2->SetLineColor(kBlack);
-  h1_epi_PcointimeROC2->Draw();
+  h1_epi_PcointimeROC2->DrawNormalized();
   h1_epi_PcointimeROC2_C->SetFillColor(kBlue);
   h1_epi_PcointimeROC2_C->SetMarkerColor(kBlue);
   h1_epi_PcointimeROC2_C->SetLineColor(kBlue);
-  h1_epi_PcointimeROC2_C->Draw("SAME");
+  h1_epi_PcointimeROC2_C->DrawNormalized("SAME");
   h1_epi_PcointimeROC2_B->SetMarkerColor(kRed);
   h1_epi_PcointimeROC2_B->SetLineColor(kRed);
-  h1_epi_PcointimeROC2_B->Draw("SAME");
+  h1_epi_PcointimeROC2_B->DrawNormalized("SAME");
 
-  TCanvas *cc2 = new TCanvas ("cc2","cc2",1200,800);
+  TCanvas *cc2 = new TCanvas ("cc2","cc2",800,800);
   cc2->Divide(4,2);
   cc2->cd(1);
-  h_hdeltac->SetLineColor(kBlue);                                                        
+  h_hdeltac->SetLineColor(kBlue);                                                                        
   h_hdeltac->DrawNormalized("p e1");
   s_hdelta->SetLineColor(kRed);
   s_hdelta->DrawNormalized("same");
@@ -587,8 +583,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   s_hytar->SetLineColor(kRed); 
   s_hytar->DrawNormalized("same");  
   cc2->cd(5); 
-  h_pdeltac->SetLineColor(kBlue);
-  h_pdeltac->DrawNormalized("p e1");
+  h_pdelta->SetLineColor(kBlue);
+  h_pdelta->DrawNormalized("p e1");
   s_pdelta->SetLineColor(kRed);
   s_pdelta->DrawNormalized("same"); 
   cc2->cd(6);
@@ -607,13 +603,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   s_pytar->SetLineColor(kRed);
   s_pytar->DrawNormalized("same");
 
+  cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_spec_compare.pdf",runnumber));
 
-  if (numruns > 1 ){
-   cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_%d_SIDIS_spec_compare.pdf",runnum1,runnum2));
-  }
-  else {
-cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_spec_compare.pdf",runnum1));
-  }
 
   TCanvas *cc = new TCanvas ("cc",Form("cc Run: %d",runnumber));
 
@@ -702,14 +693,8 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
   // h_phipqs->DrawNormalized("same");
 
   // cc->SaveAs("UTIL_SIDIS/PLOTS/sidis_kine_comp_${runnumber}.pdf");
-  if (numruns > 1) {
-   cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_%d_SIDIS_kine_compare.pdf",runnum1,runnum2));
-  }
-  else {
-   cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_kine_compare.pdf",runnum1));
-  }
+  cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_kine_compare.pdf",runnumber));
 
 
   //  gSystem->Exit(1) ; 
-
 }
