@@ -16,4 +16,4 @@ script="UTIL_SIDIS/PeterB.C"
 runbc="root -l \"${script}(${runNum}, ${targ})\""
 eval ${runbc}
 
-echo "If the plots look good quit root otherwise call an expert"
+

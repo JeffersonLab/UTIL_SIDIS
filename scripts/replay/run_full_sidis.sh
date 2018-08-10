@@ -1,5 +1,7 @@
 #! /bin/bash
 
+#ulimit -v 8000000
+ulimit -v 10000000
 
 SPEC="COIN"
 

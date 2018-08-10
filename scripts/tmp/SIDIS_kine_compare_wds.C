@@ -15,7 +15,7 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
   /////// Rootfiles for dummy runs ///
   Int_t numdummy = 2; // runmber of dummy runs
   const Int_t dummyRun[numdummy]={3500,3501};  // run number of the dummy runs
-  Double_t d_chr_ratio = 7.72;    // charge ratio of regular to dummy runs LH2 = 122 mC, LD2 = 84.3 mC, dummy=15.8 mC
+  Double_t d_chr_ratio = -7.72;    // charge ratio of regular to dummy runs LH2 = 122 mC, LD2 = 84.3 mC, dummy=15.8 mC, minus because it is to be subtracted.
 
   if (targ == 1) {
       fileNameM += "sidis_h_";
@@ -50,7 +50,7 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
   else if (targ == 1) Double_t mtarget = 0.93827; //Gev/c2  mass of hydrogen for run 2050
 
   Double_t z_had;                                         //added
-  Double_t E_pi, diff_p, ptd, MissMass2d, pKinW_2, pkinW;                                //added
+  Double_t E_pi, diff_p, ptd, MissMass2d, pKinW_2, pkinW, dspkinW;                                //added
 
   
   //make histograms:
@@ -272,8 +272,8 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
   //////  for Dummy subtraction  /////
 
   Double_t dsHgtrX, dsHgtrTh, dsHgtrY, dsHgtrPh, dshdelta, dsPgtrX, dsPgtrTh, dsPgtrY, dsPgtrPh, dspdelta;
-  Double_t dsHgtrBetaCalc, dsPgtrBetaCalc, dsPgtrP, dsHgtrP, dsPhodStatus, dsPhodStartTime, dsPhodfpHitsTime;
-  Double_t dscointime, dsHhodStatus, dsHhodStartTime, dsHhodfpHitsTime, dsSHMSpartMass, dsHMSpartMass;
+  Double_t dsPgtrP, dsHgtrP, dsPhodStatus, dsPhodStartTime, dsPhodfpHitsTime;
+  Double_t dscointime, dsHhodStatus, dsHhodStartTime, dsHhodfpHitsTime;
   Double_t dspkinomega, dspkinQ2, dspkinxbj, dspEm, dspPm, dspbeta, dshbeta, dshcalepr, dshcaletot, dshcernpe, dspcaletot, dspcalepr, dspcernpe, dspaeronpe;
   Double_t dspkinPmiss, dspkinq, dspkinthetaq, dspkinphx_cm, dspkinph_xq; 
   Double_t dsTcoinpTRIG1_ROC1_tdcTimeRaw, dsTcoinpTRIG4_ROC1_tdcTimeRaw, dsTcoinpTRIG1_ROC2_tdcTimeRaw;
@@ -345,14 +345,14 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
   td->Draw("P.hod.starttime >> SHMShodoStartTime", dsepiCut && dshpdelta );  
   TH1D *h1dsPhodoStartTime = (TH1D*)gDirectory->Get("SHMShodoStartTime");
   h1dsPhodoStartTime->GetXaxis()->SetTitle("SHMS hodo start time [ns]");           
-  Double_t PhodoStartTimeMeands = h1dsPhodoStartTime->GetMean();  
+  Double_t dsPhodoStartTimeMean = h1dsPhodoStartTime->GetMean();  
 
                    
   TCanvas *canvas4 = new TCanvas("canvas4","canvas4");                           
   td->Draw("H.hod.starttime >> HMShodoStartTime", dsepiCut && dshpdelta );  
   TH1D *h1dsHhodoStartTime = (TH1D*)gDirectory->Get("HMShodoStartTime");           
   h1HhodoStartTime->GetXaxis()->SetTitle("HMS hodo start time [ns]");            
-  Double_t HhodoStartTimeMeands = h1dsHhodoStartTime->GetMean();                     
+  Double_t dsHhodoStartTimeMean = h1dsHhodoStartTime->GetMean();                     
 
 
 
@@ -446,8 +446,6 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
 	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
 	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
 
-	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
-	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
 
 	SHMScorrCoinTimeROC1 = (TcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
 
@@ -488,8 +486,6 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
 	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
 	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
 
-	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
-	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
 
 	SHMScorrCoinTimeROC1 = (TcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
 
@@ -616,8 +612,8 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
     td->GetEntry(kd);
     if (kd % 50000 == 0) cout << kd*100/nentriesD << "   % of data done" << endl;
     evtType = td->GetLeaf("fEvtHdr.fEvtType")->GetValue(); 
-    hpdelta_cut = hdelta > -10 && hdelta < 10 && pdelta > -10 && pdelta < 20 ;
-    epievent_cut = paeronpe > 0. && pcalepr < 0.2 && pcaletot < 0.5 && hcaletot > 0.6 && hcaletot < 2.0 && hpdelta_cut  && hcernpe > 0.;
+    hpdelta_cut = dshdelta > -10 && dshdelta < 10 && dspdelta > -10 && dspdelta < 20 ;
+    epievent_cut = dspaeronpe > 0. && dspcalepr < 0.2 && dspcaletot < 0.5 && dshcaletot > 0.6 && dshcaletot < 2.0 && hpdelta_cut  && dshcernpe > 0.;
     event_cut = epievent_cut;
 
 
@@ -625,19 +621,17 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
      SHMSpartMass = 0.1395704; // pion mass in GeV/c^2 
 
 	//  ---------------cointime calculation ------------------
-	DeltaHMSpathLength = 12.462*HgtrTh + 0.1138*HgtrTh*HgtrX - 0.0154*HgtrX - 72.292*HgtrTh*HgtrTh - 0.0000544*HgtrX*HgtrX - 116.52*HgtrPh*HgtrPh;               
-	PgtrBetaCalc = PgtrP/sqrt(PgtrP*PgtrP + SHMSpartMass*SHMSpartMass);        
-	HgtrBetaCalc = HgtrP/sqrt(HgtrP*HgtrP + HMSpartMass*HMSpartMass);          
+	DeltaHMSpathLength = 12.462*dsHgtrTh + 0.1138*dsHgtrTh*dsHgtrX - 0.0154*dsHgtrX - 72.292*dsHgtrTh*dsHgtrTh - 0.0000544*dsHgtrX*dsHgtrX - 116.52*dsHgtrPh*dsHgtrPh;               
+	PgtrBetaCalc = dsPgtrP/sqrt(dsPgtrP*dsPgtrP + SHMSpartMass*SHMSpartMass);        
+	HgtrBetaCalc = dsHgtrP/sqrt(dsHgtrP*dsHgtrP + HMSpartMass*HMSpartMass);          
 
-	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
-	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (dsPhodoStartTimeMean - dsPhodfpHitsTime);                                                                   
+	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (dsHhodoStartTimeMean - dsHhodfpHitsTime);      
 
-	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
-	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
 
-	SHMScorrCoinTimeROC1 = (TcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
+	SHMScorrCoinTimeROC1 = (dsTcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (dsTcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
 
-	SHMScorrCoinTimeROC2 = (TcoinpTRIG1_ROC2_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC2_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; 
+	SHMScorrCoinTimeROC2 = (dsTcoinpTRIG1_ROC2_tdcTimeRaw*0.1 - SHMScoinCorr) - (dsTcoinpTRIG4_ROC2_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; 
 	h1_depi_PcointimeROC2->Fill(SHMScorrCoinTimeROC2);    
             
 	//-------------------------------------------------------------------------
@@ -652,8 +646,8 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
     td->GetEntry(kc);
     if (kc % 50000 == 0) cout << kc*100/nentriesDS << "   % of data done" << endl;
     evtType = td->GetLeaf("fEvtHdr.fEvtType")->GetValue(); 
-    hpdelta_cut = hdelta > -10 && hdelta < 10 && pdelta > -10 && pdelta < 20 ;
-    epievent_cut = paeronpe > 0. && pcalepr < 0.2 && pcaletot < 0.5 && hcaletot > 0.6 && hcaletot < 2.0 && hpdelta_cut  && hcernpe > 0.;
+    hpdelta_cut = dshdelta > -10 && dshdelta < 10 && dspdelta > -10 && dspdelta < 20 ;
+    epievent_cut = dspaeronpe > 0. && dspcalepr < 0.2 && dspcaletot < 0.5 && dshcaletot > 0.6 && dshcaletot < 2.0 && hpdelta_cut  && dshcernpe > 0.;
     event_cut = epievent_cut;
 
 
@@ -661,47 +655,104 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
      SHMSpartMass = 0.1395704; // pion mass in GeV/c^2 
 
 	//  ---------------cointime calculation ------------------
-	DeltaHMSpathLength = 12.462*HgtrTh + 0.1138*HgtrTh*HgtrX - 0.0154*HgtrX - 72.292*HgtrTh*HgtrTh - 0.0000544*HgtrX*HgtrX - 116.52*HgtrPh*HgtrPh;               
-	PgtrBetaCalc = PgtrP/sqrt(PgtrP*PgtrP + SHMSpartMass*SHMSpartMass);        
-	HgtrBetaCalc = HgtrP/sqrt(HgtrP*HgtrP + HMSpartMass*HMSpartMass);          
+	DeltaHMSpathLength = 12.462*dsHgtrTh + 0.1138*dsHgtrTh*dsHgtrX - 0.0154*dsHgtrX - 72.292*dsHgtrTh*dsHgtrTh - 0.0000544*dsHgtrX*dsHgtrX - 116.52*dsHgtrPh*dsHgtrPh;               
+	PgtrBetaCalc = dsPgtrP/sqrt(dsPgtrP*dsPgtrP + SHMSpartMass*SHMSpartMass);        
+	HgtrBetaCalc = dsHgtrP/sqrt(dsHgtrP*dsHgtrP + HMSpartMass*HMSpartMass);          
 
-	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
-	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (dsPhodoStartTimeMean - dsPhodfpHitsTime);                                                                   
+	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (dsHhodoStartTimeMean - dsHhodfpHitsTime);      
 
-	SHMScoinCorr = SHMScentralPathLen / (speedOfLight*PgtrBetaCalc) + (SHMSpathLength - SHMScentralPathLen) / (speedOfLight*PgtrBetaCalc) + (PhodoStartTimeMean - PhodfpHitsTime);                                                                   
-	HMScoinCorr = HMScentralPathLen / (speedOfLight*HgtrBetaCalc) + DeltaHMSpathLength / (speedOfLight*HgtrBetaCalc) + (HhodoStartTimeMean - HhodfpHitsTime);      
+	SHMScorrCoinTimeROC1 = (dsTcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (dsTcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
 
-	SHMScorrCoinTimeROC1 = (TcoinpTRIG1_ROC1_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC1_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; // 0.1 to convert to ns 
-
-	SHMScorrCoinTimeROC2 = (TcoinpTRIG1_ROC2_tdcTimeRaw*0.1 - SHMScoinCorr) - (TcoinpTRIG4_ROC2_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; 
+	SHMScorrCoinTimeROC2 = (dsTcoinpTRIG1_ROC2_tdcTimeRaw*0.1 - SHMScoinCorr) - (dsTcoinpTRIG4_ROC2_tdcTimeRaw*0.1 - HMScoinCorr) - pOffset; 
 
         ctime_cut = SHMScorrCoinTimeROC2 > dmax_value - 1.5 && SHMScorrCoinTimeROC2 < dmax_value + 1.5;
 
         if (ctime_cut) {
-	  h_Q2ds->Fill(pkinQ2);
-	  pKinW_2= pkinW*pkinW;
+	  h_Q2ds->Fill(dspkinQ2);
+	  pKinW_2= dspkinW*dspkinW;
 	  h_W2ds->Fill(pKinW_2);
-	  h_xd->Fill(pkinxbj);
-	  E_pi = sqrt(pow(pionMass,2) + pow(PgtrP,2));
-	  z_had = E_pi/pkinomega;
-	  h_zd->Fill(z_had);
-	  ptd = (PgtrP)*sin(pkinthetaq);
-          h_ptd->Fill(ptd);  
-          if (targ == 2) pEm = pkinomega + 0.9389187 - E_pi ;
-          MissMass2d = pEm*pEm - pPm*pPm;
-	  h_MissMass2d->Fill(MissMass2d); 
-	  h_hdelta->Fill(hdelta);  
-          h_hxptar->Fill(HgtrTh);
-          h_hyptar->Fill(HgtrPh);
-	  h_hytar->Fill(HgtrY); 
-	  h_pdelta->Fill(pdelta); 
-          h_pxptar->Fill(PgtrTh);
-          h_pyptar->Fill(PgtrPh);
-	  h_pytar->Fill(PgtrY); 
-	  h1_epi_PcointimeROC2_C->Fill(SHMScorrCoinTimeROC2);    
+	  h_xds->Fill(dspkinxbj);
+	  E_pi = sqrt(pow(pionMass,2) + pow(dsPgtrP,2));
+	  z_had = E_pi/dspkinomega;
+	  h_zds->Fill(z_had);
+	  ptd = (dsPgtrP)*sin(dspkinthetaq);
+          h_ptds->Fill(ptd);  
+          if (targ == 2) pEm = dspkinomega + 0.9389187 - E_pi ;
+          MissMass2d = dspEm*dspEm - dspPm*dspPm;
+	  h_MissMass2ds->Fill(MissMass2d); 
+	  h_hdeltads->Fill(dshdelta);  
+          h_hxptards->Fill(dsHgtrTh);
+          h_hyptards->Fill(dsHgtrPh);
+	  h_hytards->Fill(dsHgtrY); 
+	  h_pdeltads->Fill(dspdelta); 
+          h_pxptards->Fill(dsPgtrTh);
+          h_pyptards->Fill(dsPgtrPh);
+	  h_pytards->Fill(dsPgtrY); 
+	  h1_depi_PcointimeROC2_C->Fill(SHMScorrCoinTimeROC2);    
 	}
     }
   }  
+
+
+
+  TH1D *h_Q2dc = new TH1D(*h_Q2c); // for dummy subtracted events
+  if (!(h_Q2dc->GetSumw2N() > 0)) h_Q2dc->Sumw2(kTRUE);
+  h_Q2dc->Add(h_Q2ds,d_chr_ratio);
+
+  TH1D *h_W2dc = new TH1D(*h_W2c);
+  if (!(h_W2dc->GetSumw2N() > 0)) h_W2dc->Sumw2(kTRUE);
+  h_W2dc->Add(h_W2ds,d_chr_ratio);
+
+  TH1D *h_xdc = new TH1D(*h_xc);                                       
+  if (!(h_xdc->GetSumw2N() > 0)) h_xdc->Sumw2(kTRUE);
+  h_xdc->Add(h_xds,d_chr_ratio);
+
+  TH1D *h_zdc = new TH1D(*h_zc);    
+  if (!(h_zdc->GetSumw2N() > 0)) h_zdc->Sumw2(kTRUE);
+  h_zdc->Add(h_zds,d_chr_ratio);
+
+  TH1D *h_ptdc = new TH1D(*h_ptc); 
+  if (!(h_ptdc->GetSumw2N() > 0)) h_ptdc->Sumw2(kTRUE);
+  h_ptdc->Add(h_ptds,d_chr_ratio);
+
+  TH1D *h_MissMass2dc = new TH1D(*h_MissMass2c);
+  if (!(h_MissMass2dc->GetSumw2N() > 0)) h_MissMass2dc->Sumw2(kTRUE);
+  h_MissMass2dc->Add(h_MissMass2ds,d_chr_ratio);
+  
+  TH1D *h_hdeltadc = new TH1D(*h_hdeltac); // for clean events
+  if (!(h_hdeltadc->GetSumw2N() > 0)) h_hdeltadc->Sumw2(kTRUE);
+  h_hdeltadc->Add(h_hdeltads,d_chr_ratio);
+
+  TH1D *h_hxptardc = new TH1D(*h_hxptarc); // for clean events
+  if (!(h_hxptardc->GetSumw2N() > 0)) h_hxptardc->Sumw2(kTRUE);
+  h_hxptardc->Add(h_hxptards,d_chr_ratio);
+
+  TH1D *h_hyptardc = new TH1D(*h_hyptarc); // for clean events
+  if (!(h_hyptardc->GetSumw2N() > 0)) h_hyptardc->Sumw2(kTRUE);
+  h_hyptardc->Add(h_hyptards,d_chr_ratio);
+
+  TH1D *h_hytardc = new TH1D(*h_hytarc); // for clean events
+  if (!(h_hytardc->GetSumw2N() > 0)) h_hytardc->Sumw2(kTRUE);
+  h_hytardc->Add(h_hytards,d_chr_ratio);
+
+
+  TH1D *h_pdeltadc = new TH1D(*h_pdeltac); // for clean events
+  if (!(h_pdeltadc->GetSumw2N() > 0)) h_pdeltadc->Sumw2(kTRUE);
+  h_pdeltadc->Add(h_pdeltads,d_chr_ratio);
+
+  TH1D *h_pxptardc = new TH1D(*h_pxptarc); // for clean events
+  if (!(h_pxptardc->GetSumw2N() > 0)) h_pxptardc->Sumw2(kTRUE);
+  h_pxptardc->Add(h_pxptards,d_chr_ratio);
+
+  TH1D *h_pyptardc = new TH1D(*h_pyptarc); // for clean events
+  if (!(h_pyptardc->GetSumw2N() > 0)) h_pyptardc->Sumw2(kTRUE);
+  h_pyptardc->Add(h_pyptards,d_chr_ratio);
+    
+  TH1D *h_pytardc = new TH1D(*h_pytarc); // for clean events
+  if (!(h_pytardc->GetSumw2N() > 0)) h_pytardc->Sumw2(kTRUE);
+  h_pytardc->Add(h_pytards,d_chr_ratio);
+
 
 
   h_Q2d->GetXaxis()->SetTitle("Q2 (GeV2)");
@@ -807,55 +858,65 @@ void SIDIS_kine_compare_wds(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t p
   h1_epi_PcointimeROC2_B->SetLineColor(kRed);
   h1_epi_PcointimeROC2_B->Draw("SAME");
 
+  TCanvas *cd1 = new TCanvas ("cd1","cd1",500,500);
+  cd1->Divide(1,1);
+  cd1->cd(1);
+  h1_depi_PcointimeROC2->SetLineColor(kBlack);
+  h1_depi_PcointimeROC2->Draw();
+  h1_depi_PcointimeROC2_C->SetFillColor(kBlue);
+  h1_depi_PcointimeROC2_C->SetMarkerColor(kBlue);
+  h1_depi_PcointimeROC2_C->SetLineColor(kBlue);
+  h1_depi_PcointimeROC2_C->Draw("SAME");
+
   TCanvas *cc2 = new TCanvas ("cc2","cc2",800,800);
   cc2->Divide(4,2);
   cc2->cd(1);
-  h_hdeltac->SetLineColor(kBlue);                                                                        
-  h_hdeltac->DrawNormalized("p e1");
+  h_hdeltadc->SetLineColor(kBlue);            
+  h_hdeltadc->DrawNormalized("p e1");
   s_hdelta->SetLineColor(kRed);
   s_hdelta->DrawNormalized("same");
   cc2->cd(2);  
-  h_hxptarc->SetLineColor(kBlue);
-  h_hxptarc->DrawNormalized("p e1"); 
+  h_hxptardc->SetLineColor(kBlue);
+  h_hxptardc->DrawNormalized("p e1"); 
   s_hxptar->SetLineColor(kRed);
   s_hxptar->DrawNormalized("same"); 
   cc2->cd(3);
-  h_hyptarc->SetLineColor(kBlue);
-  h_hyptarc->DrawNormalized("p e1");
+  h_hyptardc->SetLineColor(kBlue);
+  h_hyptardc->DrawNormalized("p e1");
   s_hyptar->SetLineColor(kRed);
   s_hyptar->DrawNormalized("same");  
   cc2->cd(4);
-  h_hytarc->SetLineColor(kBlue);
-  h_hytarc->DrawNormalized("p e1");
+  h_hytardc->SetLineColor(kBlue);
+  h_hytardc->DrawNormalized("p e1");
   s_hytar->SetLineColor(kRed); 
   s_hytar->DrawNormalized("same");  
   cc2->cd(5); 
-  h_pdelta->SetLineColor(kBlue);
-  h_pdelta->DrawNormalized("p e1");
+  h_pdeltadc->SetLineColor(kBlue);
+  h_pdeltadc->DrawNormalized("p e1");
   s_pdelta->SetLineColor(kRed);
   s_pdelta->DrawNormalized("same"); 
   cc2->cd(6);
-  h_pxptarc->SetLineColor(kBlue);
-  h_pxptarc->DrawNormalized("p e1");
+  h_pxptardc->SetLineColor(kBlue);
+  h_pxptardc->DrawNormalized("p e1");
   s_pxptar->SetLineColor(kRed);
   s_pxptar->DrawNormalized("same");
   cc2->cd(7);
-  h_pyptarc->SetLineColor(kBlue);
-  h_pyptarc->DrawNormalized("p e1");
+  h_pyptardc->SetLineColor(kBlue);
+  h_pyptardc->DrawNormalized("p e1");
   s_pyptar->SetLineColor(kRed);
   s_pyptar->DrawNormalized("same"); 
   cc2->cd(8);
-  h_pytarc->SetLineColor(kBlue);
-  h_pytarc->DrawNormalized("p e1");
+  h_pytardc->SetLineColor(kBlue);
+  h_pytardc->DrawNormalized("p e1");
   s_pytar->SetLineColor(kRed);
   s_pytar->DrawNormalized("same");
 
 
   if (numruns > 1 ){
-   cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_%d_SIDIS_spec_compare.pdf",runnum1,runnum2));
+   cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_%d_SIDIS_spec_compare_dummy_subtracted.pdf",runnum1,runnum2));
   }
   else {
-cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_spec_compare.pdf",runnum1));
+cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_spec_compare_dummy_subtracted.pdf",runnum1));
   }
 
   TCanvas *cc = new TCanvas ("cc",Form("cc Run: %d",runnumber));
@@ -868,20 +929,20 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
   cc->Divide(3,2);
 
   cc->cd(1);
-  h_W2c->SetFillColor(kBlue);
-  h_W2c->SetMarkerColor(kBlue);
-  h_W2c->SetLineColor(kBlue);
-  h_W2c->DrawNormalized("p e1");
+  h_W2dc->SetFillColor(kBlue);
+  h_W2dc->SetMarkerColor(kBlue);
+  h_W2dc->SetLineColor(kBlue);
+  h_W2dc->DrawNormalized("p e1");
   h_W2s->SetMarkerColor(kRed);
   h_W2s->SetLineColor(kRed);
   h_W2s->DrawNormalized("SAME");
 
 
   cc->cd(2);
-  h_Q2c->SetFillColor(kBlue);
-  h_Q2c->SetMarkerColor(kBlue);
-  h_Q2c->SetLineColor(kBlue);
-  h_Q2c->DrawNormalized("p e1");
+  h_Q2dc->SetFillColor(kBlue);
+  h_Q2dc->SetMarkerColor(kBlue);
+  h_Q2dc->SetLineColor(kBlue);
+  h_Q2dc->DrawNormalized("p e1");
   h_Q2s->SetFillStyle(1001);
   h_Q2s->SetLineColor(kRed);
   h_Q2s->SetMarkerColor(kRed);
@@ -890,10 +951,10 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
 
 
   cc->cd(3);
-  h_xc->SetFillColor(kBlue);
-  h_xc->SetMarkerColor(kBlue);
-  h_xc->SetLineColor(kBlue);
-  h_xc->DrawNormalized("p e1");
+  h_xdc->SetFillColor(kBlue);
+  h_xdc->SetMarkerColor(kBlue);
+  h_xdc->SetLineColor(kBlue);
+  h_xdc->DrawNormalized("p e1");
   h_xs->SetFillStyle(1001);
   h_xs->SetMarkerColor(kRed);
   h_xs->SetLineColor(kRed);
@@ -902,10 +963,10 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
 
   
   cc->cd(4);
-  h_zc->SetFillColor(kBlue);
-  h_zc->SetMarkerColor(kBlue);
-  h_zc->SetLineColor(kBlue);
-  h_zc->DrawNormalized("p e1");
+  h_zdc->SetFillColor(kBlue);
+  h_zdc->SetMarkerColor(kBlue);
+  h_zdc->SetLineColor(kBlue);
+  h_zdc->DrawNormalized("p e1");
   h_zs->SetFillStyle(1001);
   h_zs->SetMarkerColor(kRed);
   h_zs->SetLineColor(kRed);
@@ -913,10 +974,10 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
 
   
   cc->cd(5);
-  h_ptc->SetFillColor(kBlue);
-  h_ptc->SetMarkerColor(kBlue);
-  h_ptc->SetLineColor(kBlue);
-  h_ptc->DrawNormalized("p e1");
+  h_ptdc->SetFillColor(kBlue);
+  h_ptdc->SetMarkerColor(kBlue);
+  h_ptdc->SetLineColor(kBlue);
+  h_ptdc->DrawNormalized("p e1");
   h_pts->SetFillStyle(1001);
   h_pts->SetMarkerColor(kRed);
   h_pts->SetLineColor(kRed);
@@ -924,32 +985,22 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
 
 
   cc->cd(6);
-  h_MissMass2c->SetFillColor(kBlue);
-  h_MissMass2c->SetMarkerColor(kBlue);
-  h_MissMass2c->SetLineColor(kBlue);
-  h_MissMass2c->DrawNormalized("p e1");
+  h_MissMass2dc->SetFillColor(kBlue);
+  h_MissMass2dc->SetMarkerColor(kBlue);
+  h_MissMass2dc->SetLineColor(kBlue);
+  h_MissMass2dc->DrawNormalized("p e1");
   h_MissMass2s->SetFillStyle(1001);
   h_MissMass2s->SetMarkerColor(kRed);
   h_MissMass2s->SetLineColor(kRed);
   h_MissMass2s->DrawNormalized("same");
 
 
-  // cc->cd(7);
-  // h_phipqd->SetFillColor(kBlue);
-  // h_phipqd->SetMarkerColor(kBlue);
-  // h_phipqd->SetLineColor(kBlue);
-  // h_phipqd->DrawNormalized("p e1");
-  // h_phipqs->SetFillStyle(1001);
-  // h_phipqs->SetMarkerColor(kRed);
-  // h_phipqs->SetLineColor(kRed);
-  // h_phipqs->DrawNormalized("same");
 
-  // cc->SaveAs("UTIL_SIDIS/PLOTS/sidis_kine_comp_${runnumber}.pdf");
   if (numruns > 1) {
-   cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_%d_SIDIS_kine_compare.pdf",runnum1,runnum2));
+   cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_%d_SIDIS_kine_compare_dummy_subtracted.pdf",runnum1,runnum2));
   }
   else {
-   cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_kine_compare.pdf",runnum1));
+   cc->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOTS/%d_SIDIS_kine_compare_dummy_subtracted.pdf",runnum1));
   }
 
 

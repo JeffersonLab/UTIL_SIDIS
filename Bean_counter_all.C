@@ -198,9 +198,9 @@ void Bean_counter_all(Int_t runNumber, Int_t shms_polarity=1,Int_t last_event=-1
         cntsek++;
     } 
 
-    PgtrBetaCalcP = PgtrP/sqrt(PgtrP*PgtrP + (.938*.938));        
-    PgtrBetaCalcK = PgtrP/sqrt(PgtrP*PgtrP + (.4976*.4976));        
-    PgtrBetaCalcPi = PgtrP/sqrt(PgtrP*PgtrP + (.1396*.1396));        
+    PgtrBetaCalcP = PgtrP/sqrt(PgtrP*PgtrP + ( 0.93827231* 0.93827231));        
+    PgtrBetaCalcK = PgtrP/sqrt(PgtrP*PgtrP + (0.497648*0.497648));        
+    PgtrBetaCalcPi = PgtrP/sqrt(PgtrP*PgtrP + (0.1395704*0.1395704));        
 
         DeltaHMSpathLength = 12.462*HgtrTh + 0.1138*HgtrTh*HgtrX - 0.0154*HgtrX - 72.292*HgtrTh*HgtrTh - 0.0000544*HgtrX*HgtrX - 116.52*HgtrPh*HgtrPh;    
 	PgtrBetaCalc = PgtrP/sqrt(PgtrP*PgtrP + SHMSpartMass*SHMSpartMass);        

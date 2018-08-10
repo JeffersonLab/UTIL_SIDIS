@@ -5,7 +5,7 @@
 
 //void SIDIS_kine_compare(Int_t runnumber, Int_t targ=1, Int_t pisign=1, Int_t kingrp=1, Int_t ptgrp=1){
 void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisign, Int_t kingrp, Int_t ptgrp){
-                     
+                   
 
   TString ROOT_FILE_PATH = "/net/cdaq/cdaql3data/cdaq/hallc-online/ROOTfiles/";
   TString SIMC_ROOT_FILE_PATH = "/net/cdaq/cdaql3data/cdaq/hallc-online/SIMC_ROOTfiles/";
@@ -97,8 +97,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *s_hyptar = new TH1D("s_hyptar","HMS YPTAR (rad)",100,-0.1,0.1);
   TH1D *s_hytar = new TH1D("s_hytar","HMS YTAR (cm)",100,-5.0,5.0);
   TH1D *s_pdelta = new TH1D("s_pdelta","SHMS DELTA (%)",100,-25,30);   
-  TH1D *s_pxptar = new TH1D("s_sxptar","SHMS XPTAR (rad)",100,-0.15,0.15);
-  TH1D *s_pyptar = new TH1D("s_syptar","SHMS YPTAR (rad)",100,-0.15,0.15);
+  TH1D *s_pxptar = new TH1D("s_sxptar","SHMS XPTAR (rad)",100,-0.1,0.1);
+  TH1D *s_pyptar = new TH1D("s_syptar","SHMS YPTAR (rad)",100,-0.08,0.08);
   TH1D *s_pytar = new TH1D("s_sytar","SHMS YTAR (cm)",100,-5,5);  
 
   TH1D *h_hdelta = new TH1D("h_hdelta","HMS DELTA (%)",100,-15,15);      
@@ -106,8 +106,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_hyptar = new TH1D("h_hyptar","HMS YPTAR (rad)",100,-0.1,0.1);
   TH1D *h_hytar = new TH1D("h_hytar","HMS YTAR (cm)",100,-5.0,5.0);    
   TH1D *h_pdelta = new TH1D("h_pdelta","SHMS DELTA (%)",100,-25,30);          
-  TH1D *h_pxptar = new TH1D("h_sxptar","SHMS XPTAR (rad)",100,-0.15,0.15);
-  TH1D *h_pyptar = new TH1D("h_syptar","SHMS YPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_pxptar = new TH1D("h_sxptar","SHMS XPTAR (rad)",100,-0.1,0.1);
+  TH1D *h_pyptar = new TH1D("h_syptar","SHMS YPTAR (rad)",100,-0.08,0.08);
   TH1D *h_pytar = new TH1D("h_pytar","SHMS YTAR (cm)",100,-5,5); 
 
   TH1D *h_hdeltaa = new TH1D("h_hdeltaa","HMS DELTA (%)",100,-15,15);      
@@ -116,8 +116,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   TH1D *h_hytara = new TH1D("h_hytara","HMS YTAR (cm)",100,-5.0,5.0);    
 
   TH1D *h_pdeltaa = new TH1D("h_pdeltaa","SHMS DELTA (%)",100,-25,30); 
-  TH1D *h_pxptara = new TH1D("h_sxptara","SHMS XPTAR (rad)",100,-0.15,0.15);
-  TH1D *h_pyptara = new TH1D("h_syptara","SHMS YPTAR (rad)",100,-0.15,0.15);
+  TH1D *h_pxptara = new TH1D("h_sxptara","SHMS XPTAR (rad)",100,-0.1,0.1);
+  TH1D *h_pyptara = new TH1D("h_syptara","SHMS YPTAR (rad)",100,-0.08,0.08);
   TH1D *h_pytara = new TH1D("h_pytara","SHMS YTAR (cm)",100,-5,5); 
 
 
@@ -393,11 +393,11 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
 	  h_hdeltaa->Fill(hdelta);  
           h_hxptara->Fill(HgtrTh);
           h_hyptara->Fill(HgtrPh);
-	  h_hytar->Fill(HgtrY);
+	  h_hytara->Fill(HgtrY);
 	  h_pdeltaa->Fill(pdelta); 
           h_pxptara->Fill(PgtrTh);
           h_pyptara->Fill(PgtrPh);
-	  h_pytar->Fill(PgtrY); 
+	  h_pytara->Fill(PgtrY); 
 	  h1_epi_PcointimeROC2_B->Fill(SHMScorrCoinTimeROC2);    
         }
     }
@@ -551,7 +551,7 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   gROOT->SetBatch(kFALSE);
 
 
-  TCanvas *cc1 = new TCanvas ("cc1","cc1",500,500);
+  TCanvas *cc1 = new TCanvas ("cc1","cc1",800,800);
   cc1->Divide(1,1);
   cc1->cd(1);
   h1_epi_PcointimeROC2->SetLineColor(kBlack);
@@ -564,10 +564,10 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   h1_epi_PcointimeROC2_B->SetLineColor(kRed);
   h1_epi_PcointimeROC2_B->Draw("SAME");
 
-  TCanvas *cc2 = new TCanvas ("cc2","cc2",800,800);
+  TCanvas *cc2 = new TCanvas ("cc2","cc2",1200,800);
   cc2->Divide(4,2);
   cc2->cd(1);
-  h_hdeltac->SetLineColor(kBlue);                                                                        
+  h_hdeltac->SetLineColor(kBlue);                                                        
   h_hdeltac->DrawNormalized("p e1");
   s_hdelta->SetLineColor(kRed);
   s_hdelta->DrawNormalized("same");
@@ -587,8 +587,8 @@ void SIDIS_kine_compare(Int_t numruns, Int_t runnumber,  Int_t targ, Int_t pisig
   s_hytar->SetLineColor(kRed); 
   s_hytar->DrawNormalized("same");  
   cc2->cd(5); 
-  h_pdelta->SetLineColor(kBlue);
-  h_pdelta->DrawNormalized("p e1");
+  h_pdeltac->SetLineColor(kBlue);
+  h_pdeltac->DrawNormalized("p e1");
   s_pdelta->SetLineColor(kRed);
   s_pdelta->DrawNormalized("same"); 
   cc2->cd(6);
@@ -711,4 +711,5 @@ cc2->Print(Form("/net/cdaqfs/home/cdaq/hallc-online/hallc_replay/UTIL_SIDIS/PLOT
 
 
   //  gSystem->Exit(1) ; 
+
 }

@@ -152,12 +152,14 @@ void PeterB(Int_t runNumber, Int_t targ=1){
 
     tt->GetEntry(kk);
 
-    if (kk % 10000 == 0) cout << kk*100/nentriesD << "   % of data done" << endl;
+    if (kk % 10000 == 0) cout << kk*100/nentriesD << "   % of data done" << 
+PgtrP << endl;
 
     evtType = tt->GetLeaf("fEvtHdr.fEvtType")->GetValue(); 
+    // was -10, 10, -15, 20 thru 4178)
+    if(hdelta > -15 && hdelta < 15 && 
 
-    if(hdelta > -10 && hdelta < 10 && 
-       pdelta > -15 && pdelta < 20 &&
+       pdelta > -25 && pdelta < 40 &&
        hcaletot>0.6 && hcernpe>1) {
 
        SHMSpartMass = 0.1395704; // pion mass in GeV/c^2 

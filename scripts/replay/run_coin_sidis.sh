@@ -1,6 +1,6 @@
 #! /bin/bash
 
-
+ulimit -v 8000000
 SPEC="COIN"
 
 # What is the last run number for the spectrometer.
